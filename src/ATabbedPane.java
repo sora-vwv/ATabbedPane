@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 /*
-@author sora_wvw
+@author sora_vwv
 */
 
 public class ATabbedPane extends JPanel {
