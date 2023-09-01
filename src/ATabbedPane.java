@@ -7,6 +7,10 @@ import java.awt.event.MouseWheelEvent;
 import java.util.ArrayList;
 import java.util.Objects;
 
+/*
+@author sora_wvw
+*/
+
 public class ATabbedPane extends JPanel {
 
     private static final int WIDTH_TAB_MARGIN = 10;
