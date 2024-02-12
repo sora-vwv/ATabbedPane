@@ -45,6 +45,7 @@ public class ATabbedPane extends JPanel {
         rootTabsPanel.add(scrollTabsPanel);
         {
             Color background = new JButton().getBackground();
+            final Color[] pressedColor = new Color[1];
 
             JLabel left = new JLabel("<");
             rootTabsPanel.add(left);
@@ -54,21 +55,32 @@ public class ATabbedPane extends JPanel {
             left.setBorder(new EmptyBorder(0,WIDTH_TAB_MARGIN,0,WIDTH_TAB_MARGIN));
             left.setMaximumSize(new Dimension(25, 25));
             left.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
+                public void mousePressed(MouseEvent e) {
+                    pressedColor[0] = background.brighter().brighter();
+                    left.setBackground(pressedColor[0]);
                     left();
+                    super.mousePressed(e);
                 }
 
                 @Override
-                public void mousePressed(MouseEvent e) {
-                    super.mousePressed(e);
-                    left.setBackground(background.brighter());
+                public void mouseEntered(MouseEvent e) {
+                    super.mouseEntered(e);
+                    pressedColor[0] = background.brighter();
+                    left.setBackground(pressedColor[0]);
+                }
+
+                @Override
+                public void mouseExited(MouseEvent e) {
+                    pressedColor[0] = background;
+                    left.setBackground(pressedColor[0]);
+                    super.mouseExited(e);
                 }
 
                 @Override
                 public void mouseReleased(MouseEvent e) {
+                    pressedColor[0] = background.brighter();
+                    left.setBackground(pressedColor[0]);
                     super.mouseReleased(e);
-                    left.setBackground(background);
                 }
             });
 
@@ -81,20 +93,32 @@ public class ATabbedPane extends JPanel {
             right.setMaximumSize(new Dimension(25, 25));
             right.addMouseListener(new MouseAdapter() {
                 @Override
-                public void mouseClicked(MouseEvent e) {
+                public void mousePressed(MouseEvent e) {
+                    pressedColor[0] = background.brighter().brighter();
+                    right.setBackground(pressedColor[0]);
                     right();
+                    super.mousePressed(e);
                 }
 
                 @Override
-                public void mousePressed(MouseEvent e) {
-                    super.mousePressed(e);
-                    right.setBackground(background.brighter());
+                public void mouseEntered(MouseEvent e) {
+                    super.mouseEntered(e);
+                    pressedColor[0] = background.brighter();
+                    right.setBackground(pressedColor[0]);
+                }
+
+                @Override
+                public void mouseExited(MouseEvent e) {
+                    pressedColor[0] = background;
+                    right.setBackground(pressedColor[0]);
+                    super.mouseExited(e);
                 }
 
                 @Override
                 public void mouseReleased(MouseEvent e) {
+                    pressedColor[0] = background.brighter();
+                    right.setBackground(pressedColor[0]);
                     super.mouseReleased(e);
-                    right.setBackground(background);
                 }
             });
         }
@@ -193,7 +217,10 @@ public class ATabbedPane extends JPanel {
             tabsPanel.add(tab);
         rootTabsPanel.repaint();
 
-        int x = selected.getX() - selected.getWidth() - scrollTabsPanel.getX();
+        // - + - - работает, но удерживает с правой стороны
+        int x = selected.getX() - scrollTabsPanel.getWidth() + selected.getWidth() - tabs.get(index).getWidth()  - scrollTabsPanel.getX();
+        System.out.println("left: " + x);
+        //int x = selected.getX() - scrollTabsPanel.getWidth() - selected.getWidth() + tabs.get(index).getWidth() - scrollTabsPanel.getX();
         if (x < scrollTabsPanel.getHorizontalScrollBar().getValue())
             scrollTabsPanel.getHorizontalScrollBar().setValue(x);
     }
@@ -217,12 +244,17 @@ public class ATabbedPane extends JPanel {
         rootTabsPanel.repaint();
 
         int x = selected.getX() - scrollTabsPanel.getWidth() + selected.getWidth() + tabs.get(index).getWidth() - scrollTabsPanel.getX();
+
+        System.out.println("right: " + x);
+
         if (x > scrollTabsPanel.getHorizontalScrollBar().getValue())
-            scrollTabsPanel.getHorizontalScrollBar().setValue(x);
+        scrollTabsPanel.getHorizontalScrollBar().setValue(x);
     }
 
     public class ATabbedPaneTab extends JPanel {
         private final Component component;
+
+        final boolean[] isSelected = new boolean[1];
 
         private final Color unselect;
         private final Color select;
@@ -230,17 +262,36 @@ public class ATabbedPane extends JPanel {
         private ATabbedPaneTab(String title, Component component) {
             super();
 
+
             JLabel label = new JLabel(title);
             label.setBorder(new EmptyBorder(0,WIDTH_TAB_MARGIN,0,WIDTH_TAB_MARGIN));
             setMaximumSize(new Dimension(label.getMinimumSize().width+WIDTH_TAB_MARGIN, getMaximumSize().height));
             unselect = getBackground();
             select = getBackground().brighter();
             addMouseListener(new MouseAdapter() {
+                public void mouseEntered(MouseEvent e) {
+                    if(isSelected[0] == false) {
+                        e.getComponent().setBackground(getBackground().darker());
+                    }
+                    super.mouseEntered(e);
+                }
+
                 @Override
-                public void mouseClicked(MouseEvent e) {
+                public void mouseExited(MouseEvent e) {
+                    if(isSelected[0] == false) {
+                    e.getComponent().setBackground(unselect);
+                    }
+                    super.mouseExited(e);
+                }
+
+                @Override
+                public void mousePressed(MouseEvent e) {
                     // выбор на левую кнопку мыши
-                    if (e.getButton() == MouseEvent.BUTTON1)
+                    if (e.getButton() == MouseEvent.BUTTON1) {
                         select();
+                        isSelected[0] = true;
+                    }
+
                     // удаление таба на правую кнопку мыши
                     if (e.getButton() == MouseEvent.BUTTON3)
                         removeTab(component);
@@ -267,6 +318,8 @@ public class ATabbedPane extends JPanel {
         private void unselect() {
             if (selected != this) return;
             setBackground(unselect);
+            isSelected[0] = false;
+
         }
     }
 
